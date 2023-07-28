@@ -65,8 +65,6 @@ class Query_Monitor_Algolia {
 		add_filter( 'qm/collectors', __NAMESPACE__ . '\register_qmalgolia_collectors_constants', 999, 2 );
 		add_filter( 'qm/collectors', __NAMESPACE__ . '\register_qmalgolia_collectors_status', 999, 2 );
 
-		require 'includes/conditionals.php';
-
 		/**
 		 * Fires at the end of our primary class includes method.
 		 *
