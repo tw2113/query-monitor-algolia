@@ -60,10 +60,10 @@ class Query_Monitor_Algolia {
 	public function includes() {
 		if ( class_exists( 'QM_Collector' ) ) {
 			require 'collectors/constants.php';
-			require 'collectors/meta.php';
+			require 'collectors/status.php';
 		}
 		add_filter( 'qm/collectors', __NAMESPACE__ . '\register_qmalgolia_collectors_constants', 999, 2 );
-		add_filter( 'qm/collectors', __NAMESPACE__ . '\register_qmalgolia_collectors_meta', 999, 2 );
+		add_filter( 'qm/collectors', __NAMESPACE__ . '\register_qmalgolia_collectors_status', 999, 2 );
 
 		require 'includes/conditionals.php';
 
@@ -86,10 +86,10 @@ class Query_Monitor_Algolia {
 	public function include_outputters( $output ) {
 		if ( class_exists( 'QM_Output_Html' ) ) {
 			require 'outputters/constants.php';
-			require 'outputters/meta.php';
+			require 'outputters/status.php';
 		}
 		add_filter( 'qm/outputter/html', __NAMESPACE__ . '\register_qmalgolia_output_html_constants', 999, 2 );
-		add_filter( 'qm/outputter/html', __NAMESPACE__ . '\register_qmalgolia_output_html_meta', 999, 2 );
+		add_filter( 'qm/outputter/html', __NAMESPACE__ . '\register_qmalgolia_output_html_status', 999, 2 );
 
 		/**
 		 * Fires at the end of our primary class include_outputters method.
