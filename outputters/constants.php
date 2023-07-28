@@ -33,7 +33,7 @@ class Query_Monitor_Algolia_HTML_Constants extends \QM_Output_Html {
 	public function __construct( QM_Collector $collector ) {
 		parent::__construct( $collector );
 
-		add_filter( 'qm/output/menus', array( $this, 'admin_menu' ), 101 );
+		add_filter( 'qm/output/menus', [ $this, 'admin_menu' ], 101 );
 	}
 
 	/**
@@ -94,11 +94,9 @@ class Query_Monitor_Algolia_HTML_Constants extends \QM_Output_Html {
 	 * @return array
 	 */
 	public function admin_menu( array $menu ) {
-		$add = array(
+		$menu[] = $this->menu( [
 			'title' => sprintf( esc_html__( '%s Constants', 'query-monitor-algolia' ), 'WP Search with Algolia' ),
-		);
-
-		$menu[] = $this->menu( $add );
+		] );
 
 		return $menu;
 	}
