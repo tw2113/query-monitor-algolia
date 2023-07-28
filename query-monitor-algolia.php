@@ -62,8 +62,9 @@ class Query_Monitor_Algolia {
 			require 'collectors/constants.php';
 			require 'collectors/status.php';
 		}
-		add_filter( 'qm/collectors', __NAMESPACE__ . '\register_qmalgolia_collectors_constants', 999, 2 );
+
 		add_filter( 'qm/collectors', __NAMESPACE__ . '\register_qmalgolia_collectors_status', 999, 2 );
+		add_filter( 'qm/collectors', __NAMESPACE__ . '\register_qmalgolia_collectors_constants', 999, 2 );
 
 		/**
 		 * Fires at the end of our primary class includes method.
@@ -86,8 +87,9 @@ class Query_Monitor_Algolia {
 			require 'outputters/constants.php';
 			require 'outputters/status.php';
 		}
-		add_filter( 'qm/outputter/html', __NAMESPACE__ . '\register_qmalgolia_output_html_constants', 999, 2 );
+
 		add_filter( 'qm/outputter/html', __NAMESPACE__ . '\register_qmalgolia_output_html_status', 999, 2 );
+		add_filter( 'qm/outputter/html', __NAMESPACE__ . '\register_qmalgolia_output_html_constants', 999, 2 );
 
 		/**
 		 * Fires at the end of our primary class include_outputters method.
