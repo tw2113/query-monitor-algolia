@@ -8,6 +8,7 @@
 
 namespace tw2113\qmalgolia;
 
+use Exception;
 use QM_Collector;
 use QueryMonitor;
 
@@ -41,6 +42,8 @@ class Query_Monitor_Algolia_Collector_Status extends QM_Collector {
 
 	public $data;
 
+	private $wpswa;
+
 	/**
 	 * Query_Monitor_Algolia_Collector_Status constructor.
 	 *
@@ -49,6 +52,7 @@ class Query_Monitor_Algolia_Collector_Status extends QM_Collector {
 	public function __construct() {
 		parent::__construct();
 		$this->data = [];
+		$this->wpswa = \Algolia_Plugin_Factory::create();
 	}
 
 	/**
@@ -70,9 +74,10 @@ class Query_Monitor_Algolia_Collector_Status extends QM_Collector {
 	public function process() {
 		$this->data['current']          = [];
 		$this->data['indexable-status'] = [];
+		$this->data['indices']          = [];
 		$this->data['setting-status']   = [];
 
-		$wpswa = \Algolia_Plugin_Factory::create();
+		$client = $this->wpswa->get_api()->get_client();
 
 		$searchable_types = get_post_types( [
 			'exclude_from_search' => false
@@ -84,23 +89,48 @@ class Query_Monitor_Algolia_Collector_Status extends QM_Collector {
 				switch ( get_class( $object ) ) {
 					case 'WP_Post' :
 						$this->data['current'][] = [
-							'title' => 'Is a:',
+							'title' => esc_html__( 'Is a:', 'query-monitor-algolia' ),
 							'value' => $object->post_type,
 						];
 						$this->data['current'][] = [
-							'title' => 'Is indexable?',
+							'title' => esc_html__( 'Is search indexable?', 'query-monitor-algolia' ),
 							'value' => ( in_array( $object->post_type, $searchable_types ) ) ? 'true' : 'false',
 						];
+						$the_index = $this->wpswa->get_index( 'searchable_posts' );
+						$remote_index = $client->initIndex( $the_index->get_name() );
+						// All objects get the suffix regardless of size. Safe to use.
+						$objID = $object->ID . '-0';
+						try {
+							$found = $remote_index->getObject( $objID );
+							if ( ! empty( $found ) ) {
+								$this->data['current'][] = [
+									'title' => esc_html__( 'Is currently indexed?', 'query-monitor-algolia' ),
+									'value' => 'true',
+								];
+							} else {
+								$this->data['current'][] = [
+									'title' => esc_html__( 'Is currently indexed?', 'query-monitor-algolia' ),
+									'value' => 'false',
+								];
+							}
+						} catch ( Exception $e ) {
+							$this->data['current'][] = [
+								'title' => esc_html__( 'Is currently indexed?', 'query-monitor-algolia' ),
+								'value' => 'false - ' . $e->getMessage(),
+							];
+						}
+
+						$h ='';
 						break;
 					case 'WP_Term' :
 						$this->data['current'][] = [
-							'title' => 'Is a:',
+							'title' => esc_html__( 'Is a:', 'query-monitor-algolia' ),
 							'value' => 'Term archive'
 						];
 						break;
 					case 'WP_User':
 						$this->data['current'][] = [
-							'title' => 'Is a:',
+							'title' => esc_html__( 'Is a:', 'query-monitor-algolia' ),
 							'value' => 'User archive'
 						];
 						break;
@@ -110,41 +140,72 @@ class Query_Monitor_Algolia_Collector_Status extends QM_Collector {
 		}
 
 		$this->data['indexable-status'][] = [
-			'title' => 'Searchable post index enabled?',
-			'value' => ( $wpswa->get_index( 'searchable_posts' )->is_enabled() ) ? 'true' : 'false',
+			'title' => esc_html__( 'Searchable post index enabled?', 'query-monitor-algolia' ),
+			'value' => ( $this->wpswa->get_index( 'searchable_posts' )->is_enabled() ) ? 'true' : 'false',
 		];
 
 		$this->data['indexable-status'][] = [
-			'title' => 'Indexable Post Types:',
+			'title' => esc_html__( 'Indexable Post Types:', 'query-monitor-algolia' ),
 			'value' => implode( ', ', $searchable_types ),
 		];
 
+		$this->data['indices'] = $this->flatten_indices();
+
 		$this->data['setting-status'][] = [
-			'title' => 'API is reachable?',
-			'value' => ( $wpswa->get_settings()->get_api_is_reachable() ) ? 'true' : 'false'
+			'title' => esc_html__( 'API is reachable?', 'query-monitor-algolia' ),
+			'value' => ( $this->wpswa->get_settings()->get_api_is_reachable() ) ? 'true' : 'false'
 		];
 		$this->data['setting-status'][] = [
-			'title' => 'Autocomplete enabled?',
-			'value' => $wpswa->get_settings()->get_autocomplete_enabled()
+			'title' => esc_html__( 'Autocomplete enabled?', 'query-monitor-algolia' ),
+			'value' => $this->wpswa->get_settings()->get_autocomplete_enabled()
 		];
 		$this->data['setting-status'][] = [
-			'title' => 'Autocomplete config(s):',
-			'value' => $this->flatten_autocomplete_config( $wpswa )
+			'title' => esc_html__( 'Autocomplete config(s):', 'query-monitor-algolia' ),
+			'value' => $this->flatten_autocomplete_config()
 		];
 		$this->data['setting-status'][] = [
-			'title' => 'Search style:',
-			'value' => ucfirst( $wpswa->get_settings()->get_override_native_search() )
+			'title' =>  esc_html__( 'Search style:', 'query-monitor-algolia' ),
+			'value' => ucfirst( $this->wpswa->get_settings()->get_override_native_search() ),
+		];
+		$this->data['settings-status'][] = [
+			'title' => esc_html__( 'Prefix:', 'query-monitor-algolia' ),
+			'value' => $this->wpswa->get_settings()->get_index_name_prefix(),
 		];
 		$this->data['setting-status'][] = [
-			'title' => 'Powered by enabed?',
-			'value' => ( $wpswa->get_settings()->is_powered_by_enabled() ) ? 'true' : 'false'
+			'title' =>  esc_html__( 'Powered by enabed?', 'query-monitor-algolia' ),
+			'value' => ( $this->wpswa->get_settings()->is_powered_by_enabled() ) ? 'true' : 'false'
 		];
 	}
 
-	private function flatten_autocomplete_config( $wpswa ) {
-		$configs = $wpswa->get_settings()->get_autocomplete_config();
-		$data = json_encode( $configs );
-		return $data;
+	private function flatten_autocomplete_config() {
+		$configs = $this->wpswa->get_settings()->get_autocomplete_config();
+		return json_encode( $configs );
+	}
+
+	private function flatten_indices() {
+		$result = get_transient( 'qmalgolia_indices_cache' );
+
+		if ( false !== $result ) {
+			if ( ! defined( 'SCRIPT_DEBUG' ) || ( defined( 'SCRIPT_DEBUG' ) && false === SCRIPT_DEBUG ) ) {
+				return json_encode( $result );
+			}
+		}
+
+		$indices = $this->wpswa->get_api()->get_client()->listIndices();
+		$prefix = $this->wpswa->get_settings()->get_index_name_prefix();
+		$result = [];
+		foreach( $indices['items'] as $index ) {
+			if ( false === strpos( $index['name'], $prefix ) ) {
+				continue;
+			}
+			$result[] = [
+				'name'        => $index['name'],
+				'found_count' => $index['entries'],
+				'last_update' => date( 'Y-m-d:h:i:s', strtotime( $index['updatedAt'] ) )
+			];
+		}
+		set_transient( 'qmalgolia_indices_cache', $result, 30 * MINUTE_IN_SECONDS );
+		return json_encode( $result );
 	}
 }
 
