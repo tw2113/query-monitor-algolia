@@ -55,6 +55,10 @@ class Query_Monitor_Algolia_HTML_Status extends \QM_Output_Html {
 					$this->get_current_displayed_content( $data );
 				endif;
 
+				if ( ! empty( $data['template'] ) ) :
+					$this->get_current_template( $data );
+				endif;
+
 				$this->get_indexable_search_status( $data );
 
 				if ( ! empty( $data['indices'] ) ) :
@@ -71,6 +75,38 @@ class Query_Monitor_Algolia_HTML_Status extends \QM_Output_Html {
 		<?php
 	}
 
+	/**
+	 * Output for the template file found section.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param $data
+	 */
+	private function get_current_template( $data ) {
+		?>
+		<section>
+			<h3><?php esc_html_e( 'Algolia template', 'query-monitor-algolia' ); ?></h3>
+			<table>
+				<tbody>
+				<?php foreach( $data['template'] as $item ) : ?>
+					<tr>
+						<td><?php echo esc_html( $item['title'] ); ?></td>
+						<td><?php echo esc_html( $item['value'] ); ?></td>
+					</tr>
+				<?php endforeach; ?>
+				</tbody>
+			</table>
+		</section>
+		<?php
+	}
+
+	/**
+	 * Output for the indexable search status section.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param $data
+	 */
 	private function get_indexable_search_status( $data ) {
 		?>
 		<section>
@@ -102,6 +138,13 @@ class Query_Monitor_Algolia_HTML_Status extends \QM_Output_Html {
 	<?php
 	}
 
+	/**
+	 * Output for the Indexes section.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param $data
+	 */
 	private function get_algolia_indexes( $data ) {
 		?>
 		<section>
@@ -136,6 +179,13 @@ class Query_Monitor_Algolia_HTML_Status extends \QM_Output_Html {
 	<?php
 	}
 
+	/**
+	 * Output for the current displayed item content.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param $data
+	 */
 	private function get_current_displayed_content( $data ) {
 		?>
 		<section>
@@ -167,6 +217,13 @@ class Query_Monitor_Algolia_HTML_Status extends \QM_Output_Html {
 	<?php
 	}
 
+	/**
+	 * Output for the settings status content.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param $data
+	 */
 	private function get_settings_status( $data ) {
 		?>
 		<section>

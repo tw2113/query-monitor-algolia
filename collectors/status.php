@@ -8,6 +8,7 @@
 
 namespace tw2113\qmalgolia;
 
+use Algolia_Plugin;
 use Exception;
 use QM_Collector;
 use QueryMonitor;
@@ -40,8 +41,28 @@ class Query_Monitor_Algolia_Collector_Status extends QM_Collector {
 	 */
 	private $post_id = 0;
 
+	/**
+	 * Template path for our loaded autocomplete or instantsearch file.
+	 *
+	 * @since 1.0.0
+	 * @var string
+	 */
+	private $found_template_path;
+
+	/**
+	 * Data container.
+	 *
+	 * @since 1.0.0
+	 * @var array
+	 */
 	public $data;
 
+	/**
+	 * Algolia_Plugin instance.
+	 *
+	 * @since 1.0.0
+	 * @var Algolia_Plugin
+	 */
 	private $wpswa;
 
 	/**
@@ -53,6 +74,37 @@ class Query_Monitor_Algolia_Collector_Status extends QM_Collector {
 		parent::__construct();
 		$this->data = [];
 		$this->wpswa = \Algolia_Plugin_Factory::create();
+	}
+
+	/**
+	 * Set_up method.
+	 *
+	 * @since 1.0.0
+	 */
+	public function set_up() {
+		parent::set_up();
+
+		add_filter( 'template_include', [ $this, 'get_algolia_template_path' ], PHP_INT_MAX );
+	}
+
+	/**
+	 * Get template path used.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $template Template path.
+	 * @return mixed
+	 */
+	function get_algolia_template_path( $template ) {
+		if ( ! in_array( basename( $template ), [ 'autocomplete.php', 'instantsearch.php' ] ) ) {
+			return $template;
+		}
+
+		$template_path = $template;
+
+		$this->found_template_path = str_replace( WP_CONTENT_DIR, '', $template_path );
+
+		return $template;
 	}
 
 	/**
@@ -73,6 +125,7 @@ class Query_Monitor_Algolia_Collector_Status extends QM_Collector {
 	 */
 	public function process() {
 		$this->data['current']          = [];
+		$this->data['template']         = [];
 		$this->data['indexable-status'] = [];
 		$this->data['indices']          = [];
 		$this->data['setting-status']   = [];
@@ -137,6 +190,13 @@ class Query_Monitor_Algolia_Collector_Status extends QM_Collector {
 				}
 
 			}
+		}
+
+		if ( ! empty( $this->found_template_path ) ) {
+			$this->data['template'][] = [
+				'title' => esc_html__( 'Found path', 'query-monitor-algolia' ),
+				'value' => $this->found_template_path
+			];
 		}
 
 		$this->data['indexable-status'][] = [
