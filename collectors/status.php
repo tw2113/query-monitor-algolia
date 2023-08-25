@@ -201,7 +201,7 @@ class Query_Monitor_Algolia_Collector_Status extends QM_Collector {
 			$result[] = [
 				'name'        => $index['name'],
 				'found_count' => $index['entries'],
-				'last_update' => date( 'Y-m-d:h:i:s', strtotime( $index['updatedAt'] ) )
+				'last_update' => date( 'Y-m-d h:i:s', strtotime( $index['updatedAt'] ) )
 			];
 		}
 		set_transient( 'qmalgolia_indices_cache', $result, 30 * MINUTE_IN_SECONDS );
