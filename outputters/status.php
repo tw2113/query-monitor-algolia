@@ -50,14 +50,15 @@ class Query_Monitor_Algolia_HTML_Status extends \QM_Output_Html {
 
 				<?php
 				ob_start();
+
+				if ( ! empty( $data['current'] ) ) :
+					$this->get_current_displayed_content( $data );
+				endif;
+
 				$this->get_indexable_search_status( $data );
 
 				if ( ! empty( $data['indices'] ) ) :
 					$this->get_algolia_indexes( $data );
-				endif;
-
-				if ( ! empty( $data['current'] ) ) :
-					$this->get_current_displayed_content( $data );
 				endif;
 
 				$this->get_settings_status( $data );
