@@ -208,7 +208,7 @@ class Query_Monitor_Algolia_HTML_Status extends \QM_Output_Html {
 	 */
 	public function admin_menu( array $menu ) {
 		$menu[] = $this->menu( [
-			'title' => sprintf( esc_html__( '%s Status', 'query-monitor-algolia' ), 'WP Search with Algolia' ),
+			'title' => esc_html__( 'WP Search with Algolia Status', 'query-monitor-algolia' )
 		] );
 
 		return $menu;
