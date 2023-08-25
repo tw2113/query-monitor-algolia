@@ -61,9 +61,11 @@ class Query_Monitor_Algolia {
 		if ( class_exists( 'QM_Collector' ) ) {
 			require 'collectors/constants.php';
 			require 'collectors/status.php';
+			require 'collectors/index-settings.php';
 		}
 
 		add_filter( 'qm/collectors', __NAMESPACE__ . '\register_qmalgolia_collectors_status', 999, 2 );
+		add_filter( 'qm/collectors', __NAMESPACE__ . '\register_qmalgolia_collectors_index_settings', 999, 2 );
 		add_filter( 'qm/collectors', __NAMESPACE__ . '\register_qmalgolia_collectors_constants', 999, 2 );
 
 		/**
@@ -86,9 +88,11 @@ class Query_Monitor_Algolia {
 		if ( class_exists( 'QM_Output_Html' ) ) {
 			require 'outputters/constants.php';
 			require 'outputters/status.php';
+			require 'outputters/index-settings.php';
 		}
 
 		add_filter( 'qm/outputter/html', __NAMESPACE__ . '\register_qmalgolia_output_html_status', 999, 2 );
+		add_filter( 'qm/outputter/html', __NAMESPACE__ . '\register_qmalgolia_output_html_index_settings', 999, 2 );
 		add_filter( 'qm/outputter/html', __NAMESPACE__ . '\register_qmalgolia_output_html_constants', 999, 2 );
 
 		/**
