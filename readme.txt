@@ -15,6 +15,36 @@ Adds support for [WP Search with Algolia](https://www.wordpress.org/plugins/wp-s
 
 * Defined WP Search with Algolia constants for a given request.
 
+## Features
+
+### Status panel
+
+#### Current displayed item
+* Content type listing
+* If is searchable
+* If is currently indexed.
+
+#### Search status
+* Searchable post index enabled
+* List of indexable post types
+
+#### Indexes
+Table of index names, entries count, and last updated timestamp for current site.
+
+#### WP Search with Algolia settings status
+* API is reachable
+* Autocomplete enabled
+* Collected Autocomplete configurations list
+* Search style (native/backend/instantsearch)
+* "Powered by" enabled.
+
+### Index Settings
+* List of all current index configuration for each index associated with the current site.
+
+### Constants panel
+
+List of any defined WP Search with Algolia PHP constants and current defined value.
+
 == Installation ==
 
 = Minimum Requirements =
