@@ -14,9 +14,9 @@
  * Author: Michael Beckwith
  * Contributors: tw2113
  * Requires at least: 6.2.2
- * Tested up to: 6.3
+ * Tested up to: 6.4.1
  * Requires PHP: 7.4
- * Stable tag: 1.0.0
+ * Stable tag: 1.1.0
  * Text Domain: query-monitor-algolia
  * License: MIT
  */
@@ -42,6 +42,8 @@ if (
  */
 class Query_Monitor_Algolia {
 
+	private $is_algolia_pro_available = false;
+
 	/**
 	 * Execute our hooks.
 	 *
@@ -50,6 +52,30 @@ class Query_Monitor_Algolia {
 	public function do_hooks() {
 		add_action( 'plugins_loaded', [ $this, 'includes' ], 0 );
 		add_filter( 'qm/outputter/html', [ $this, 'include_outputters' ], 0 );
+		add_filter( 'init', [ $this, 'check_for_algolia_pro' ] );
+	}
+
+	/**
+	 * Check if we have either Query Monitor or Algolia Free.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool
+	 */
+	private function meets_requirements() {
+		if ( ! defined( 'QM_VERSION' ) || ! defined( 'ALGOLIA_VERSION' ) ) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Check for Algolia Pro.
+	 *
+	 * @since 1.1.0
+	 */
+	public function check_for_algolia_pro() {
+		$this->is_algolia_pro_available = defined( 'WPSWA_PRO_VERSION' );
 	}
 
 	/**
@@ -58,7 +84,11 @@ class Query_Monitor_Algolia {
 	 * @since 1.0.0
 	 */
 	public function includes() {
+		if ( ! $this->meets_requirements() ) {
+			return;
+		}
 		if ( class_exists( 'QM_Collector' ) ) {
+			require 'helpers/seo.php';
 			require 'collectors/constants.php';
 			require 'collectors/status.php';
 			require 'collectors/index-settings.php';
@@ -85,6 +115,9 @@ class Query_Monitor_Algolia {
 	 * @return array
 	 */
 	public function include_outputters( $output ) {
+		if ( ! $this->meets_requirements() ) {
+			return $output;
+		}
 		if ( class_exists( 'QM_Output_Html' ) ) {
 			require 'outputters/constants.php';
 			require 'outputters/status.php';

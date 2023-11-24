@@ -149,6 +149,11 @@ class Query_Monitor_Algolia_Collector_Status extends QM_Collector {
 							'title' => esc_html__( 'Is search indexable?', 'query-monitor-algolia' ),
 							'value' => ( in_array( $object->post_type, $searchable_types ) ) ? 'true' : 'false',
 						];
+						$seo = new Query_Monitor_Algolia_Pro_SEO_Integration( $object );
+						$this->data['current'][] = [
+							'title' => esc_html__( 'Is SEO Indexable?', 'query-monitor-algolia' ),
+							'value' => $seo->indexable_status()
+						];
 						$the_index = $this->wpswa->get_index( 'searchable_posts' );
 						$remote_index = $client->initIndex( $the_index->get_name() );
 						// All objects get the suffix regardless of size. Safe to use.
@@ -157,23 +162,21 @@ class Query_Monitor_Algolia_Collector_Status extends QM_Collector {
 							$found = $remote_index->getObject( $objID );
 							if ( ! empty( $found ) ) {
 								$this->data['current'][] = [
-									'title' => esc_html__( 'Is currently indexed?', 'query-monitor-algolia' ),
+									'title' => esc_html__( 'Is currently search indexed?', 'query-monitor-algolia' ),
 									'value' => 'true',
 								];
 							} else {
 								$this->data['current'][] = [
-									'title' => esc_html__( 'Is currently indexed?', 'query-monitor-algolia' ),
+									'title' => esc_html__( 'Is currently search indexed?', 'query-monitor-algolia' ),
 									'value' => 'false',
 								];
 							}
 						} catch ( Exception $e ) {
 							$this->data['current'][] = [
-								'title' => esc_html__( 'Is currently indexed?', 'query-monitor-algolia' ),
+								'title' => esc_html__( 'Is currently search indexed?', 'query-monitor-algolia' ),
 								'value' => 'false - ' . $e->getMessage(),
 							];
 						}
-
-						$h ='';
 						break;
 					case 'WP_Term' :
 						$this->data['current'][] = [

@@ -2,9 +2,9 @@
 Contributors: tw2113
 Tags: query monitor, debugging, algolia, algolia search
 Requires at least: 6.2.2
-Tested up to: 6.3
+Tested up to: 6.4.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: MIT
 
 WP Search with Algolia and Query Monitor
@@ -12,8 +12,6 @@ WP Search with Algolia and Query Monitor
 == Description ==
 
 Adds support for [WP Search with Algolia](https://www.wordpress.org/plugins/wp-search-with-algolia/) information to the [Query Monitor](https://wordpress.org/plugins/query-monitor/) developer addon.
-
-* Defined WP Search with Algolia constants for a given request.
 
 ## Features
 
@@ -23,6 +21,7 @@ Adds support for [WP Search with Algolia](https://www.wordpress.org/plugins/wp-s
 * Content type listing
 * If is searchable
 * If is currently indexed.
+* If is currently SEO indexable
 
 #### Search status
 * Searchable post index enabled
@@ -56,10 +55,16 @@ List of any defined WP Search with Algolia PHP constants and current defined val
 
 == Changelog ==
 
-= 1.0.0 - Release date TBD =
+= 1.1.0 - 2023-11-24 =
+* Added: SEO noindex detection support for plugins currently supported with WP Search with Algolia Pro.
+
+= 1.0.0 - 2023-09-21 =
 * Initial release
 
 == Upgrade Notice ==
 
-= 1.0.0 - Release date TBD =
+= 1.1.0 - 2023-11-24 =
+* Added: SEO noindex detection support for plugins currently supported with WP Search with Algolia Pro.
+
+= 1.0.0 - 2023-09-21 =
 * Initial release
